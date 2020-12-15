@@ -121,11 +121,11 @@ class WorldfunclublocalPlugin : FlutterPlugin, MethodCallHandler {
 
     private fun openGaoDeMap(dlat: Double, dlon: Double, dname: String) {
         if (checkMapAppsIsExist(context, "com.autonavi.minimap")) {
-            val intent = Intent(Intent.ACTION_VIEW)
+            val intent = Intent(Intent.ACTION_VIEW).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.setPackage("com.autonavi.minimap")
             intent.addCategory("android.intent.category.DEFAULT")
             intent.data = Uri.parse("androidamap://route?sourceApplication=" + "环球途乐会"
-                    .toString() + "&sname=我的位置&dlat=" + dlat
+                     + "&sname=我的位置&dlat=" + dlat
                     .toString() + "&dlon=" + dlon
                     .toString() + "&dname=" + dname + "&dev=0&m=0&t=1")
             context.startActivity(intent)
@@ -145,7 +145,7 @@ class WorldfunclublocalPlugin : FlutterPlugin, MethodCallHandler {
      */
     private fun openBaiduMap(dlat: Double, dlon: Double, dname: String) {
         if (checkMapAppsIsExist(context, "com.baidu.BaiduMap")) {
-            val intent = Intent(Intent.ACTION_VIEW)
+            val intent = Intent(Intent.ACTION_VIEW).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.data = Uri.parse("baidumap://map/direction?origin=我的位置&destination=name:"
                     + dname
                     + "|latlng:" + dlat + "," + dlon
@@ -171,7 +171,7 @@ class WorldfunclublocalPlugin : FlutterPlugin, MethodCallHandler {
      */
     private fun openTencent(dlat: Double, dlon: Double, dname: String) {
         if (checkMapAppsIsExist(context, "com.tencent.map")) {
-            val intent = Intent(Intent.ACTION_VIEW)
+            val intent = Intent(Intent.ACTION_VIEW).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.data = Uri.parse("qqmap://map/routeplan?type=bus&from=我的位置&fromcoord=0,0"
                     + "&to=" + dname
                     + "&tocoord=" + dlat + "," + dlon
