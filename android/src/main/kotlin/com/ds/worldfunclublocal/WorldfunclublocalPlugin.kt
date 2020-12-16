@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import com.ds.worldfunclub.wxapi.WXPayEntryActivity
+import com.google.zxing.client.android.CaptureActivity
 import com.tencent.mm.opensdk.modelmsg.SendAuth
 import com.tencent.mm.opensdk.modelpay.PayReq
 import com.tencent.mm.opensdk.openapi.WXAPIFactory
@@ -16,7 +17,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-
 /** WorldfunclublocalPlugin */
 class WorldfunclublocalPlugin : FlutterPlugin, MethodCallHandler {
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -72,21 +72,13 @@ class WorldfunclublocalPlugin : FlutterPlugin, MethodCallHandler {
                 result.success(null)
             }
             "callPhone" -> {
-                val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel://${call.arguments as String}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${call.arguments}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 ContextCompat.startActivity(context, intent, null)
                 result.success(null)
             }
             "scan" -> {
-//                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-//                    CaptureActivity.scan(context as Activity)
-//                } else {
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                        CaptureActivity.scan(context as Activity)
-//                    } else {
-//                        ActivityCompat.requestPermissions(context as Activity, arrayOf(Manifest.permission.CAMERA), 100)
-//                    }
-//                }
-//                result.success(null)
+                CaptureActivity.scan(context)
+                result.success(null)
             }
 
             "openLocation" -> {
@@ -125,7 +117,7 @@ class WorldfunclublocalPlugin : FlutterPlugin, MethodCallHandler {
             intent.setPackage("com.autonavi.minimap")
             intent.addCategory("android.intent.category.DEFAULT")
             intent.data = Uri.parse("androidamap://route?sourceApplication=" + "环球途乐会"
-                     + "&sname=我的位置&dlat=" + dlat
+                    + "&sname=我的位置&dlat=" + dlat
                     .toString() + "&dlon=" + dlon
                     .toString() + "&dname=" + dname + "&dev=0&m=0&t=1")
             context.startActivity(intent)
@@ -236,6 +228,11 @@ class WorldfunclublocalPlugin : FlutterPlugin, MethodCallHandler {
             map["errorMessage"] = errorMessage
             map["pay"] = pay
             internalChannel.invokeMethod("payFailed", map)
+        }
+
+        @JvmStatic
+        fun responseScan(result: String) {
+            internalChannel.invokeMethod("responseScan", result)
         }
 
         @JvmStatic

@@ -51,6 +51,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
 //                    ARouter.getInstance().build(login).withInt(LoginActivity.key_state, LoginActivity.wechat_success).withString(key_auth_wechat_code, r.code).navigation();
                 } else {
 //                    ARouter.getInstance().build(login).withInt(LoginActivity.key_state, LoginActivity.wechat_failed).navigation();
+                    finish();
                 }
                 break;
             default:

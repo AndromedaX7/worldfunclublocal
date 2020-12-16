@@ -7,11 +7,6 @@ class Worldfunclublocal {
   static const MethodChannel _channel =
       const MethodChannel('worldfunclublocal');
 
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-
   static const kWeChatPay="kWeChatPay";
   static const kWeChatCodeResponse = "weChatCodeResponse";
   static const kLoginWithWeChat = "loginWithWeChat";
@@ -28,7 +23,13 @@ class Worldfunclublocal {
               r.wechatCode(call.arguments);
             });
             return null;
-
+          case "responseScan":
+            cache.forEach((r) {
+              print("scan result =============================${call.arguments}");
+              r.responseScan(call.arguments);
+            });
+            return null;
+            break;
           default:
             handle(call);
             return null;
@@ -69,4 +70,6 @@ class Worldfunclublocal {
 
 abstract class LocalChannelResponse {
   void wechatCode(String code);
+
+  void  responseScan(String result) ;
 }

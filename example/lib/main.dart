@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:worldfunclublocal/worldfunclublocal.dart';
 
 void main() {
@@ -13,35 +11,14 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-
+class _MyAppState extends State<MyApp> with LocalChannelResponse{
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    Worldfunclublocal.listener(this, (fromCall) => null);
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await Worldfunclublocal.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
+  String result="";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -49,10 +26,88 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
+                child: Column(
+                  children: [
+                    FlatButton(
+                      onPressed: () async {
+                        if(await Permission.camera.isGranted)
+                          Worldfunclublocal.startScan();
+                        else{
+                          await Permission.camera.request().then((value) {
+                            if(value.isGranted){
+                              Worldfunclublocal.startScan();
+                            }else{
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("权限不足")));
+                            }
+                          });
+                        }
+                      },
+                      child: Text("扫一扫 $result"),
+                    ),
+
+                    FlatButton(
+                      onPressed: () async {
+                       if(await Permission.phone.isGranted)
+                         Worldfunclublocal.callPhone("10010");
+                       else{
+                         await Permission.phone.request().then((value) {
+                           if(value.isGranted){
+                             Worldfunclublocal.callPhone("10010");
+                           }else{
+                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("权限不足")));
+                           }
+                         });
+                       }
+                      },
+                      child: Text("打电话：10010"),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Worldfunclublocal.loginWithWechat();
+                      },
+                      child: Text("打开微信"),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Worldfunclublocal.startActivityWithUrl("weixin://wap/pay?appid%3Dwxa");
+                      },
+                      child: Text("打开url对应的Activity weixin://wap/pay?appid%3Dwxa"),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Worldfunclublocal.startActivityWithUrl("http://www.baidu.com");
+                      },
+                      child: Text("打开url对应的Activity http://www.baidu.com"),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Worldfunclublocal.openLocation(116.0,39.0,"");
+                      },
+                      child: Text("打开位置"),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
+  }
+
+  @override
+  void responseScan(String result) {
+     setState(() {
+       this.result=result;
+     });
+  }
+
+  @override
+  void wechatCode(String code) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(code)));
   }
 }
